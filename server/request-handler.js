@@ -11,13 +11,13 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
-
+ var resultsObj = {
+    results: []
+  };
 
  module.exports.requestHandler = function(request, response) {
   //Object to handle messages.
-  var resultsObj = {
-    results: []
-  };
+
 
   // Request and Response come from node's http module.
   //
@@ -40,13 +40,20 @@ this file and include it in basic-server.js so that it actually works.
   //Check for request to chat server.
   if (request.method === 'GET' && request.url === '/classes/messages') {
      response.writeHead(statusCode, headers);
-     response.end(JSON.stringify(resultsObj));
-  } else if (request.method === 'POST' && ( request.url === '/classes/messages'  || request.url === '/classes/room') ) {
-    console.log('response',response);
-    response.writeHead(201,headers)
-    resultsObj.results.push(request.data);
-    response.end(JSON.stringify(resultsObj));
-  } else {
+
+     response.end( JSON.stringify(resultsObj) );
+  }
+  else if (request.method === 'POST' && ( request.url === '/classes/messages'  || request.url === '/classes/room') ) {
+    request.on('data', function(data){
+      resultsObj.results.push(JSON.parse(data));
+    })
+
+    request.on('end', function() {
+      response.writeHead(201,{'Content-Type': 'text/json'});
+      response.end(JSON.stringify(resultsObj));
+    });
+  }
+  else {
     response.writeHead(404, headers);
     response.end('Not Found');
   }
