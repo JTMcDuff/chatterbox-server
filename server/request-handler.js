@@ -44,11 +44,11 @@ this file and include it in basic-server.js so that it actually works.
   } else if (request.method === 'POST' && ( request.url === '/classes/messages'  || request.url === '/classes/room') ) {
     console.log('response',response);
     response.writeHead(201,headers)
-    results.push(response);
-    response.end('You posted.');
+    resultsObj.results.push(request.data);
+    response.end(JSON.stringify(resultsObj));
   } else {
-    response.writeHead(200, headers);
-    response.end('Hello, World!');
+    response.writeHead(404, headers);
+    response.end('Not Found');
   }
 
 
@@ -85,7 +85,7 @@ this file and include it in basic-server.js so that it actually works.
 // Another way to get around this restriction is to serve you chat
 // client from this domain by setting up static file serving.
 var defaultCorsHeaders = {
-  'Content-Type': 'text/html',
+  'Content-Type': 'application/json',
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'access-control-allow-headers': 'content-type, accept',
