@@ -14,7 +14,7 @@ this file and include it in basic-server.js so that it actually works.
  var resultsObj = {
     results: []
   };
-
+ var objIdTracker = 1;
  module.exports.requestHandler = function(request, response) {
   //Object to handle messages.
 
@@ -44,14 +44,18 @@ this file and include it in basic-server.js so that it actually works.
      response.end( JSON.stringify(resultsObj) );
   }
   else if (request.method === 'POST' && ( request.url === '/classes/messages'  || request.url === '/classes/room') ) {
+    var storage;
     request.on('data', function(data){
-      resultsObj.results.push(JSON.parse(data));
+      storage = JSON.parse(data);
+      storage.objectId = objIdTracker;
+      objIdTracker ++;
+      resultsObj.results.push(storage);
     })
 
     request.on('end', function() {
       response.writeHead(201,{'Content-Type': 'text/json'});
-      response.end(JSON.stringify(resultsObj));
-    });
+      response.end(JSON.stringify( {objectId: storage.objectId} ));
+    })
   }
   else {
     response.writeHead(404, headers);
