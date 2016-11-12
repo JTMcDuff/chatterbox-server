@@ -14,6 +14,11 @@ this file and include it in basic-server.js so that it actually works.
 
 
  module.exports.requestHandler = function(request, response) {
+  //Object to handle messages.
+  var resultsObj = {
+    results: []
+  };
+
   // Request and Response come from node's http module.
   //
   // They include information about both the incoming request, such as
@@ -35,9 +40,14 @@ this file and include it in basic-server.js so that it actually works.
   //Check for request to chat server.
   if (request.method === 'GET' && request.url === '/classes/messages') {
      response.writeHead(statusCode, headers);
-     response.end('You have reached the chat server.')
+     response.end(JSON.stringify(resultsObj));
+  } else if (request.method === 'POST' && ( request.url === '/classes/messages'  || request.url === '/classes/room') ) {
+    console.log('response',response);
+    response.writeHead(201,headers)
+    results.push(response);
+    response.end('You posted.');
   } else {
-    response.writeHead(201, headers);
+    response.writeHead(200, headers);
     response.end('Hello, World!');
   }
 
